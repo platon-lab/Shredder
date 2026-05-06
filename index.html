@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Coin Shredder</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
+            --neon-blue: #00f3ff;
+            --neon-purple: #9d00ff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #fff;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
+            touch-action: manipulation;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .neon-text {
+            text-shadow: 0 0 5px var(--neon-blue), 0 0 10px var(--neon-blue);
+            color: #fff;
+        }
+
+        /* ЕКРАН ВИБОРУ */
+        #selection-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            background: inherit;
+        }
+
+        #selection-screen h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .hero-card {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid transparent;
+        }
+
+        .hero-card:active {
+            transform: scale(0.9);
+        }
+
+        .hero-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ІГРОВИЙ ЕКРАН */
+        #game-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            display: none;
+            flex-direction: column;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin: 10px;
+            height: 60px;
+            box-sizing: border-box;
+        }
+
+        .hero-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--neon-blue);
+            box-shadow: 0 0 10px var(--neon-blue);
+        }
+
+        .hero-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .score-container {
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .shop-btn {
+            background: transparent;
+            color: #fff;
+            border: 1px solid var(--neon-purple);
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(157, 0, 255, 0.5);
+            transition: 0.2s;
+        }
+        .shop-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ШРЕДЕР */
+        .shredder-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            perspective: 800px;
+        }
+
+        .shredder {
+            width: 220px;
+            height: 280px;
+            background: linear-gradient(145deg, #3a3a3a, #1a1a1a);
+            border-radius: 20px 20px 40px 40px;
+            transform: rotateX(25deg);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.8), inset 0 5px 15px rgba(255,255,255,0.2), 0 0 20px rgba(0, 243, 255, 0.2);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            border: 2px solid #444;
+            cursor: pointer;
+        }
+
+        .shredder:active {
+            transform: rotateX(25deg) translateY(5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 5px 15px rgba(255,255,255,0.2);
+        }
+
+        .hole {
+            width: 180px;
+            height: 80px;
+            background: #050505;
+            border-radius: 50%;
+            margin-top: 20px;
+            box-shadow: inset 0 15px 25px rgba(0,0,0,1), 0 2px 5px rgba(255,255,255,0.1);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .propeller {
+            width: 200%;
+            height: 200%;
+            background: repeating-conic-gradient(from 0deg, #555 0deg 30deg, #222 30deg 60deg);
+            border-radius: 50%;
+            animation: spin 0.15s linear infinite;
+            opacity: 0.9;
+        }
+
+        .shredder-details {
+            position: absolute;
+            bottom: 40px;
+            width: 140px;
+            height: 20px;
+            background: repeating-linear-gradient(90deg, #111, #111 10px, #222 10px, #222 20px);
+            border-radius: 5px;
+            box-shadow: inset 0 5px 10px rgba(0,0,0,0.8);
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* АНІМАЦІЯ ПАДІННЯ */
+        .falling-item {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 45px;
+            pointer-events: none;
+            z-index: 10;
+            animation: fallAndShred 0.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5));
+        }
+
+        @keyframes fallAndShred {
+            0% { transform: translate(-50%, -120px) scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: translate(-50%, 20px) scale(0.8) rotate(180deg); opacity: 1; }
+            100% { transform: translate(-50%, 60px) scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        .point-popup {
+            position: absolute;
+            color: var(--neon-blue);
+            font-weight: bold;
+            font-size: 24px;
+            pointer-events: none;
+            z-index: 20;
+            animation: floatUp 0.8s ease-out forwards;
+            text-shadow: 0 0 5px #fff;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -80px) scale(1.5); opacity: 0; }
+        }
+
+        /* ПАНЕЛЬ ПРЕДМЕТІВ */
+        .bottom-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            margin: 10px 20px 30px 20px;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 30px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+        .nav-btn:active {
+            transform: scale(0.8);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .current-item-display {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100px;
+            height: 100px;
+        }
+
+        .current-item-icon {
+            font-size: 40px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            animation: bounce 2s infinite ease-in-out;
+        }
+
+        .current-item-name {
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: center;
+            color: #aaa;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* МАГАЗИН */
+        #shop-screen {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            margin-top: 10px;
+        }
+
+        .shop-header h2 {
+            margin: 0;
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px var(--neon-purple);
+        }
+
+        .close-btn {
+            background: #ff3366;
+            color: white;
+            border: none;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 10px #ff3366;
+        }
+
+        .shop-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            padding-bottom: 20px;
+        }
+
+        .shop-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .shop-item-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .shop-item-icon {
+            font-size: 35px;
+        }
+
+        .shop-item-details h3 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+        }
+
+        .shop-item-details p {
+            margin: 0;
+            font-size: 14px;
+            color: var(--neon-blue);
+        }
+
+        .buy-btn {
+            background: transparent;
+            border: 2px solid var(--neon-purple);
+            color: #fff;
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .buy-btn:active {
+            transform: scale(0.9);
+            background: var(--neon-purple);
+        }
+
+        .buy-btn.bought {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            pointer-events: none;
+        }
+
+        .buy-btn.disabled {
+            border-color: #555;
+            color: #555;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- ЕКРАН ВИБОРУ ГЕРОЯ -->
+    <div id="selection-screen">
+        <h1>Обери Героя</h1>
+        <div class="grid">
+            <div class="glass hero-card" onclick="selectHero('Tito.png')">
+                <img src="Tito.png" alt="Tito" onerror="this.style.display='none'; this.parentNode.innerHTML='🐶<br>Tito'">
+            </div>
+            <div class="glass hero-card" onclick="selectHero('Smartik.png')">
+                <img src="Smartik.png" alt="Smartik" onerror="this.style.display='none'; this.parentNode.innerHTML='🐕<br>Smartik'">
+            </div>
+            <div class="glass hero-card" onclick="selectHero('Junior.png')">
+                <img src="Junior.png" alt="Junior" onerror="this.style.display='none'; this.parentNode.innerHTML='🐈<br>Junior'">
+            </div>
+            <div class="glass hero-card" onclick="selectHero('Fil.png')">
+                <img src="Fil.png" alt="Fil" onerror="this.style.display='none'; this.parentNode.innerHTML='🐩<br>Fil'">
+            </div>
+            <div class="glass hero-card" onclick="selectHero('Milka.png')">
+                <img src="Milka.png" alt="Milka" onerror="this.style.display='none'; this.parentNode.innerHTML='🐱<br>Milka'">
+            </div>
+            <div class="glass hero-card" onclick="selectHero('Bark.png')">
+                <img src="Bark.png" alt="Bark" onerror="this.style.display='none'; this.parentNode.innerHTML='🦮<br>Bark'">
+            </div>
+        </div>
+    </div>
+
+    <!-- ІГРОВИЙ ЕКРАН -->
+    <div id="game-screen">
+        <div class="glass top-bar">
+            <div class="hero-icon" id="active-hero">
+                <img id="hero-img" src="" alt="Hero">
+            </div>
+            <div class="score-container neon-text">
+                Очки: <span id="score-display">0</span>
+            </div>
+            <button class="shop-btn" onclick="openShop()">🛒 Shop</button>
+        </div>
+
+        <div class="shredder-area" id="shredder-area">
+            <div class="shredder" id="shredder-box" onclick="shredItem()">
+                <div class="hole">
+                    <div class="propeller"></div>
+                </div>
+                <div class="shredder-details"></div>
+            </div>
+        </div>
+
+        <div class="glass bottom-bar">
+            <button class="nav-btn" onclick="prevItem()">&#10094;</button>
+            <div class="current-item-display">
+                <div class="current-item-icon" id="current-icon">🍖</div>
+                <div class="current-item-name" id="current-name">Корм (+1)</div>
+            </div>
+            <button class="nav-btn" onclick="nextItem()">&#10095;</button>
+        </div>
+    </div>
+
+    <!-- МАГАЗИН -->
+    <div id="shop-screen">
+        <div class="shop-header">
+            <h2>🛒 МАГАЗИН</h2>
+            <button class="close-btn" onclick="closeShop()">&times;</button>
+        </div>
+        <div class="shop-list" id="shop-list">
+            <!-- Генерується через JS -->
+        </div>
+    </div>
+
+    <script>
+        // ДАНІ ГРИ
+        const itemsData = [
+            { id: 'food', name: "Корм", icon: "🍖", value: 1, cost: 0 },
+            { id: 'bone', name: "Кісточка", icon: "🦴", value: 10, cost: 50 },
+            { id: 'ball', name: "М'ячик", icon: "🎾", value: 100, cost: 200 },
+            { id: 'toy', name: "Іграшка", icon: "🧸", value: 1000, cost: 500 },
+            { id: 'bowl', name: "Миска", icon: "🥣", value: 10000, cost: 1500 },
+            { id: 'collar', name: "Нашийник", icon: "📿", value: 50000, cost: 3000 },
+            { id: 'leash', name: "Поводок", icon: "🪢", value: 120000, cost: 6000 },
+            { id: 'bed', name: "Лежанка", icon: "🛏️", value: 300000, cost: 12000 },
+            { id: 'house', name: "Будка", icon: "🏠", value: 800000, cost: 25000 },
+            { id: 'trainer', name: "Тренер", icon: "🧑‍🏫", value: 2000000, cost: 50000 },
+            { id: 'supertoy', name: "Супер-іграшка", icon: "🦄", value: 5000000, cost: 5000 },
+            { id: 'robot', name: "Робот-друг", icon: "🤖", value: 20000000, cost: 100000 },
+            { id: 'petcar', name: "Машинка для пса", icon: "🚗", value: 100000000, cost: 500000 },
+            { id: 'villa', name: "Пес-вілла", icon: "🏡", value: 500000000, cost: 2000000 },
+            { id: 'top', name: "Майонез", icon: "💎", value: 5000000000000, cost: 1000000000000000 }
+        ];
+
+        let gameState = {
+            hero: null,
+            score: 0,
+            unlockedItems: ['food']
+        };
+
+        let currentItemIndex = 0;
+
+        // ЕЛЕМЕНТИ DOM
+        const selectionScreen = document.getElementById('selection-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const shopScreen = document.getElementById('shop-screen');
+        const scoreDisplay = document.getElementById('score-display');
+        const heroImg = document.getElementById('hero-img');
+        const currentIconDisplay = document.getElementById('current-icon');
+        const currentNameDisplay = document.getElementById('current-name');
+        const shredderArea = document.getElementById('shredder-area');
+        const shopList = document.getElementById('shop-list');
+
+        // ІНІЦІАЛІЗАЦІЯ
+        function init() {
+            const saved = localStorage.getItem('coin_shredder_save');
+            if (saved) {
+                gameState = JSON.parse(saved);
+            }
+
+            if (gameState.hero) {
+                selectionScreen.style.display = 'none';
+                gameScreen.style.display = 'flex';
+                heroImg.src = gameState.hero;
+                heroImg.onerror = function() { this.style.display='none'; };
+                updateUI();
+            } else {
+                selectionScreen.style.display = 'flex';
+                gameScreen.style.display = 'none';
+            }
+        }
+
+        function saveGame() {
+            localStorage.setItem('coin_shredder_save', JSON.stringify(gameState));
+        }
+
+        // ВИБІР ГЕРОЯ
+        function selectHero(heroSrc) {
+            gameState.hero = heroSrc;
+            saveGame();
+            heroImg.src = heroSrc;
+            heroImg.onerror = function() { this.style.display='none'; };
+            selectionScreen.style.display = 'none';
+            gameScreen.style.display = 'flex';
+            updateUI();
+        }
+
+        // ОНОВЛЕННЯ ІНТЕРФЕЙСУ
+        function updateUI() {
+            scoreDisplay.innerText = gameState.score;
+            
+            const currentItem = getAvailableItems()[currentItemIndex];
+            if (currentItem) {
+                currentIconDisplay.innerText = currentItem.icon;
+                currentNameDisplay.innerText = `${currentItem.name} (+${currentItem.value})`;
+            }
+        }
+
+        function getAvailableItems() {
+            return itemsData.filter(item => gameState.unlockedItems.includes(item.id));
+        }
+
+        // ШРЕДИНГ (КЛІКЕР)
+        function shredItem() {
+            const currentItem = getAvailableItems()[currentItemIndex];
+            
+            // Додаємо очки
+            gameState.score += currentItem.value;
+            saveGame();
+            updateUI();
+
+            // Анімація предмета
+            const fallingEl = document.createElement('div');
+            fallingEl.className = 'falling-item';
+            fallingEl.innerText = currentItem.icon;
+            shredderArea.appendChild(fallingEl);
+
+            // Анімація тексту очок
+            const pointPopup = document.createElement('div');
+            pointPopup.className = 'point-popup';
+            pointPopup.innerText = `+${currentItem.value}`;
+            
+            // Позиціонування біля шредера
+            pointPopup.style.left = '50%';
+            pointPopup.style.top = '30%';
+            shredderArea.appendChild(pointPopup);
+
+            // Видалення після завершення анімації
+            setTimeout(() => {
+                if (fallingEl.parentNode) fallingEl.remove();
+                if (pointPopup.parentNode) pointPopup.remove();
+            }, 600);
+        }
+
+        // ПЕРЕМИКАННЯ ПРЕДМЕТІВ
+        function prevItem() {
+            const available = getAvailableItems();
+            currentItemIndex--;
+            if (currentItemIndex < 0) currentItemIndex = available.length - 1;
+            updateUI();
+        }
+
+        function nextItem() {
+            const available = getAvailableItems();
+            currentItemIndex++;
+            if (currentItemIndex >= available.length) currentItemIndex = 0;
+            updateUI();
+        }
+
+        // МАГАЗИН
+        function openShop() {
+            renderShop();
+            shopScreen.style.display = 'flex';
+        }
+
+        function closeShop() {
+            shopScreen.style.display = 'none';
+        }
+
+        function renderShop() {
+            shopList.innerHTML = '';
+            itemsData.forEach(item => {
+                if (item.cost === 0) return; // Пропускаємо стартовий предмет
+
+                const isUnlocked = gameState.unlockedItems.includes(item.id);
+                const canAfford = gameState.score >= item.cost;
+                
+                let btnHtml = '';
+                if (isUnlocked) {
+                    btnHtml = `<button class="buy-btn bought">Куплено</button>`;
+                } else if (canAfford) {
+                    btnHtml = `<button class="buy-btn" onclick="buyItem('${item.id}')">Купити</button>`;
+                } else {
+                    btnHtml = `<button class="buy-btn disabled">${item.cost} очок</button>`;
+                }
+
+                const shopItemEl = document.createElement('div');
+                shopItemEl.className = 'glass shop-item';
+                shopItemEl.innerHTML = `
+                    <div class="shop-item-info">
+                        <div class="shop-item-icon">${item.icon}</div>
+                        <div class="shop-item-details">
+                            <h3>${item.name}</h3>
+                            <p>Дає +${item.value} за клік</p>
+                        </div>
+                    </div>
+                    ${btnHtml}
+                `;
+                shopList.appendChild(shopItemEl);
+            });
+        }
+
+        function buyItem(id) {
+            const item = itemsData.find(i => i.id === id);
+            if (item && gameState.score >= item.cost && !gameState.unlockedItems.includes(id)) {
+                gameState.score -= item.cost;
+                gameState.unlockedItems.push(id);
+                saveGame();
+                updateUI();
+                renderShop(); // Оновлюємо кнопки магазину
+            }
+        }
+
+        // Запуск
+        init();
+    </script>
+</body>
+</html>
