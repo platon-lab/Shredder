@@ -60,6 +60,16 @@
             text-shadow: 0 0 10px var(--neon-purple), 0 0 20px var(--neon-purple);
         }
 
+        /* Змінено на прокручувальний контейнер для багатьох героїв */
+        .grid-container {
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
         .grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -79,6 +89,10 @@
             justify-content: center;
             background: rgba(0,0,0,0.5);
             border: 2px solid transparent;
+            text-align: center;
+            font-size: 14px;
+            padding: 5px;
+            box-sizing: border-box;
         }
 
         .hero-card:active {
@@ -418,24 +432,77 @@
     <!-- ЕКРАН ВИБОРУ ГЕРОЯ -->
     <div id="selection-screen">
         <h1>Обери Героя</h1>
-        <div class="grid">
-            <div class="glass hero-card" onclick="selectHero('Tito.png')">
-                <img src="Tito.png" alt="Tito" onerror="this.style.display='none'; this.parentNode.innerHTML='🐶<br>Tito'">
-            </div>
-            <div class="glass hero-card" onclick="selectHero('Smartik.png')">
-                <img src="Smartik.png" alt="Smartik" onerror="this.style.display='none'; this.parentNode.innerHTML='🐕<br>Smartik'">
-            </div>
-            <div class="glass hero-card" onclick="selectHero('Junior.png')">
-                <img src="Junior.png" alt="Junior" onerror="this.style.display='none'; this.parentNode.innerHTML='🐈<br>Junior'">
-            </div>
-            <div class="glass hero-card" onclick="selectHero('Fil.png')">
-                <img src="Fil.png" alt="Fil" onerror="this.style.display='none'; this.parentNode.innerHTML='🐩<br>Fil'">
-            </div>
-            <div class="glass hero-card" onclick="selectHero('Milka.png')">
-                <img src="Milka.png" alt="Milka" onerror="this.style.display='none'; this.parentNode.innerHTML='🐱<br>Milka'">
-            </div>
-            <div class="glass hero-card" onclick="selectHero('Bark.png')">
-                <img src="Bark.png" alt="Bark" onerror="this.style.display='none'; this.parentNode.innerHTML='🦮<br>Bark'">
+        <div class="grid-container">
+            <div class="grid">
+                <!-- Старі герої -->
+                <div class="glass hero-card" onclick="selectHero('Tito.png')">
+                    <img src="Tito.png" alt="Tito" onerror="this.style.display='none'; this.parentNode.innerHTML='🐶<br>Tito'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Smartik.png')">
+                    <img src="Smartik.png" alt="Smartik" onerror="this.style.display='none'; this.parentNode.innerHTML='🐕<br>Smartik'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Junior.png')">
+                    <img src="Junior.png" alt="Junior" onerror="this.style.display='none'; this.parentNode.innerHTML='🐈<br>Junior'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Fil.png')">
+                    <img src="Fil.png" alt="Fil" onerror="this.style.display='none'; this.parentNode.innerHTML='🐩<br>Fil'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Milka.png')">
+                    <img src="Milka.png" alt="Milka" onerror="this.style.display='none'; this.parentNode.innerHTML='🐱<br>Milka'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Bark.png')">
+                    <img src="Bark.png" alt="Bark" onerror="this.style.display='none'; this.parentNode.innerHTML='🦮<br>Bark'">
+                </div>
+
+                <!-- Нові 16 героїв -->
+                <div class="glass hero-card" onclick="selectHero('Persik.png')">
+                    <img src="Persik.png" alt="Persik" onerror="this.style.display='none'; this.parentNode.innerHTML='🍑<br>Persik'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Spike.png')">
+                    <img src="Spike.png" alt="Spike" onerror="this.style.display='none'; this.parentNode.innerHTML='🌵<br>Spike'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Alyonka.png')">
+                    <img src="Alyonka.png" alt="Alyonka" onerror="this.style.display='none'; this.parentNode.innerHTML='🍫<br>Alyonka'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Lilu.png')">
+                    <img src="Lilu.png" alt="Lilu" onerror="this.style.display='none'; this.parentNode.innerHTML='✨<br>Lilu'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Manya.png')">
+                    <img src="Manya.png" alt="Manya" onerror="this.style.display='none'; this.parentNode.innerHTML='🐾<br>Manya'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Liza.png')">
+                    <img src="Liza.png" alt="Liza" onerror="this.style.display='none'; this.parentNode.innerHTML='👑<br>Liza'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Grivna.png')">
+                    <img src="Grivna.png" alt="Grivna" onerror="this.style.display='none'; this.parentNode.innerHTML='💵<br>Grivna'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Ben.png')">
+                    <img src="Ben.png" alt="Ben" onerror="this.style.display='none'; this.parentNode.innerHTML='🐻<br>Ben'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Goldi.png')">
+                    <img src="Goldi.png" alt="Goldi" onerror="this.style.display='none'; this.parentNode.innerHTML='🟡<br>Goldi'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Raf.png')">
+                    <img src="Raf.png" alt="Raf" onerror="this.style.display='none'; this.parentNode.innerHTML='☕<br>Raf'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Veles.png')">
+                    <img src="Veles.png" alt="Veles" onerror="this.style.display='none'; this.parentNode.innerHTML='🐺<br>Veles'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Masha.png')">
+                    <img src="Masha.png" alt="Masha" onerror="this.style.display='none'; this.parentNode.innerHTML='👧<br>Masha'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Brilliantik.png')">
+                    <img src="Brilliantik.png" alt="Brilliantik" onerror="this.style.display='none'; this.parentNode.innerHTML='💎<br>Brilliantik'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Richik.png')">
+                    <img src="Richik.png" alt="Richik" onerror="this.style.display='none'; this.parentNode.innerHTML='💰<br>Richik'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Shunya.png')">
+                    <img src="Shunya.png" alt="Shunya" onerror="this.style.display='none'; this.parentNode.innerHTML='🐭<br>Shunya'">
+                </div>
+                <div class="glass hero-card" onclick="selectHero('Baks.png')">
+                    <img src="Baks.png" alt="Baks" onerror="this.style.display='none'; this.parentNode.innerHTML='💵<br>Baks'">
+                </div>
             </div>
         </div>
     </div>
@@ -589,7 +656,7 @@
             fallingEl.innerText = currentItem.icon;
             shredderArea.appendChild(fallingEl);
 
-            // Анімація тексту очок
+            // Анімація текста очок
             const pointPopup = document.createElement('div');
             pointPopup.className = 'point-popup';
             pointPopup.innerText = `+${currentItem.value}`;
